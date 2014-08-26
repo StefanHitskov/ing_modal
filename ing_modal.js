@@ -114,7 +114,7 @@ jQuery(document).ready(function($){
         }
 
         //for mail
-        if (window.mail_to != null){
+        if (window.ing_mail_to != null){
             $('form.imd').eq(0).append('<input name="mail_to" type="hidden" value="'+window.ing_mail_to+'" />');
         } else {
             $('form.imd').eq(0).append('<input name="mail_to" type="hidden" value="'+mail_to+'" />');
@@ -282,11 +282,6 @@ jQuery(document).ready(function($){
             'color':'#000'
         });
         $('#imd_message p').css({'font-size':'14px','margin':'0','padding':'0'});
-
-
-        if ( ing_debag ){
-
-        }
 
     }
 
