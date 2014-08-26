@@ -3,14 +3,20 @@ jQuery(document).ready(function($){
 // by Ing 
 // кручу-верчу, чтоб работало хачу
 // last-update 21.08-2014
+// attr = mailto  ( <a href="" class="mform" mailto="some@email.com"> )
 
-    var ing_debag = false;
+
 //настройки
     var modal_selector = '.myModal';
 
+//var mail_to = 'gk-dunai@mail.ru';
+    var mail_to = 'ingvar.losev@gmail.com';
+    var mail_from = 'no-replay@gk-dunai.ru';
+    var mail_subject = 'Заявка - Обратный звонок';
+
     var hasName = true;
     var hasPhone = true;
-    var hasComment = true;
+    var hasComment = false;
     var hasEmail = true;
     var canSendFile = false;
     var pathResivedFile = '';
@@ -23,14 +29,13 @@ jQuery(document).ready(function($){
     var title_color = '#E8E8E8';
     var title_font_color = '#000';
     var closeBg_Color = '#464646';
-    var closeBg_ColorHover = '#76C400';
+    var closeBg_ColorHover = '#429ADB';
     var h2_color = '#000';
     var inputs_color = '#000';
-
     var form_width = '300px';
-
     var input_fColor = '#fff';
     var input_fColorHover = '#fff';
+    var ing_debag = true;
 
 //шаблон формы
     var form_code =
@@ -40,7 +45,7 @@ jQuery(document).ready(function($){
     if ( hasPhone ){ form_code +=  '<input name="telefon" type="text" required placeholder="Телефон*" value="" />';}
     if ( hasEmail ){
         form_code += '<input name="pochta" type="text" placeholder="Ваш email" value="" />';
-        form_code += '<input name="email" type="text" placeholder="Ваш email" value="" />'; //поле проверки на робота
+        form_code += '<input name="email" type="text" placeholder="Ваш email" value="" style = "display:none;"/>'; //поле проверки на робота
     }
     if ( hasComment ) { form_code += '<textarea name="comment" type="text" placeholder="Комментарий" />'; }
     if (canSendFile){
@@ -72,6 +77,7 @@ jQuery(document).ready(function($){
         if ($(modal_selector).length > 0){
             if ($('#imd_form').length <= 0){create_form();}
             $(modal_selector).on('click',function(e){
+                if ($(this).attr('mailto') != null ){ window.ing_mail_to = $(this).attr('mailto'); }
                 show_form();
                 return false;
             });
@@ -97,20 +103,34 @@ jQuery(document).ready(function($){
         formToCenter($('#win_frame'));
     }
 
-    function send_form(obj){
-
-        if ( pathResivedFile != '' ){
+    function form_prepare(){
+        if (ing_debag){qwe('form prepare::');}
+        //file
+        if ( pathResivedFile != null ){
             $('form.imd').eq(0).append('<input name="uploadDir" type="hidden" value="'+pathResivedFile+'" />');
         }
-        if ( canSendFile && pathResivedFile == '' ){
+        if ( canSendFile && pathResivedFile == null ){
             $('form.imd').eq(0).append('<input name="uploadDir" type="hidden" value="'+findPHPmail(true)+'" />');
         }
 
-        var formData = new FormData($('form.imd')[0]);
+        //for mail
+        if (window.mail_to != null){
+            $('form.imd').eq(0).append('<input name="mail_to" type="hidden" value="'+window.ing_mail_to+'" />');
+        } else {
+            $('form.imd').eq(0).append('<input name="mail_to" type="hidden" value="'+mail_to+'" />');
+        }
+        $('form.imd').eq(0).append('<input name="mail_from" type="hidden" value="'+mail_from+'" />');
+        $('form.imd').eq(0).append('<input name="mail_subject" type="hidden" value="'+mail_subject+'" />');
+    }
 
+
+    function send_form(obj){
+        form_prepare();
+        //robot detect
         email_for_bot = $('.imd input[name=email]').val();
-        if (email_for_bot != ''){ return false; }
+        if (email_for_bot != ''){ qwe('bot::'+email_for_bot); return false; }
 
+        var formData = new FormData($('form.imd')[0]);
         $.ajax({
             type: "POST",
             processData: false,
